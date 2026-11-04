@@ -8,3 +8,17 @@ class Book(SQLModel, table=True):
     genre: str
     book_launch: date
     read: bool
+
+class CreateBook(SQLModel):
+    title: str
+    author: str
+    genre: str
+    book_launch: date
+    read: bool
+
+class UpdateBook(SQLModel):
+    title: str
+    author: str
+    genre: str
+    book_launch: date
+    read: bool
