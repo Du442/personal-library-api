@@ -11,14 +11,10 @@ connect_args = {"check_same_thread": False} if path.startswith("sqlite") else {}
 
 engine = create_engine(f"{path}", echo=True, connect_args=connect_args)
 
-class DBLocal:
-    def __init__(self, engine):
-        self.engine = engine
+def init_db() -> None:
+    from app.schemas.books import Book, CreateBook, UpdateBook
+    SQLModel.metadata.create_all(engine)
 
-    def init_db(self) -> None:
-        from app.schemas.books import Book, CreateBook, UpdateBook
-        SQLModel.metadata.create_all(self.engine)
-
-    def get_session(self) -> Generator[Session, None, None]:
-        with Session(self.engine) as session:
-            yield session
+def get_session() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        yield session
