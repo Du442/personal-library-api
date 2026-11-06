@@ -5,7 +5,7 @@ from app.db.db import get_session
 from fastapi import Depends
 
 class BookRepository:
-    def __init__(self, session: Session = Depends(get_session)) -> None:
+    def __init__(self, session: Session) -> None:
         self.session = session
 
     def create_book(self, book: CreateBook):
@@ -15,8 +15,10 @@ class BookRepository:
         self.session.refresh(book_create)
         return book_create
 
-    def update_book(self, book: UpdateBook, id: int):
+    def update_book(self, book: UpdateBook, id: int) -> Book | None:
         book_update = self.session.get(Book, id)
+        if not book_update:
+            return None
         book_data = book.model_dump(exclude_unset=True)
         book_update.sqlmodel_update(book_data)
         self.session.add(book_update)
@@ -25,7 +27,7 @@ class BookRepository:
         return book_update
 
     def read_books(self):
-        books = self.session.exec(select(Book).all())
+        books = self.session.exec(select(Book)).all()
         return books
 
     def read_book(self, id:int):
