@@ -5,14 +5,18 @@ import os
 
 load_dotenv()
 
-path = os.getenv("DB_PATH")
+path = os.getenv("DB_PATH", "database.db")
+db_url = path if path.startswith("sqlite") else f"sqlite:///{path}"
+connect_args = {"check_same_thread": False} if db_url.startswith("sqlite") else {}
 
-connect_args = {"check_same_thread": False} if path.startswith("sqlite") else {}
-
-engine = create_engine(f"{path}", echo=True, connect_args=connect_args)
+engine = create_engine(db_url, echo=True, connect_args=connect_args)
 
 def init_db() -> None:
-    from app.schemas.books import Book, CreateBook, UpdateBook
+    
+    # Importe os modelos
+    from app.schemas.books import Book
+
+    # Cria as tabelas
     SQLModel.metadata.create_all(engine)
 
 def get_session() -> Generator[Session, None, None]:
